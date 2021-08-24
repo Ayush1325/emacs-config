@@ -1,0 +1,10 @@
+*~
+/config.el
+/eln-cache/
+/elpa/
+/org-roam.db
+/.org-id-locations
+/bookmarks
+/projectile-bookmarks.eld
+/recentf
+/transient/

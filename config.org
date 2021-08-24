@@ -1,0 +1,412 @@
+* Basic Stuff
+** User Info
+#+begin_src emacs-lisp
+  (setq user-full-name "Ayush Singh")
+  (setq user-mail-address "ayush1325@protonmail.com")
+#+end_src
+
+* UI
+** Disable Toolbar
+#+begin_src emacs-lisp
+  (tool-bar-mode -1)
+#+end_src
+** Shorten Prompt
+#+begin_src emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+** Highlight Current Line
+#+begin_src emacs-lisp
+  (global-hl-line-mode 1)
+#+end_src
+** Line Numbers
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode t)
+#+end_src
+** Themes
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :config
+    (setq doom-themes-enable-bold t)
+    (setq doom-themes-enable-italic t)
+    (load-theme 'doom-one t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-org-config)
+    (doom-themes-treemacs-config))
+#+end_src
+** Modline
+*** Doom Modline
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1))
+#+end_src
+*** Hide Modline
+#+begin_src emacs-lisp
+  (use-package hide-mode-line
+    :ensure t)
+#+end_src
+** Pagebreaker
+- Needed by Dashboard.
+  #+begin_src emacs-lisp
+    (use-package page-break-lines
+      :ensure t
+      :config
+      (setq global-page-break-lines-mode 1))
+  #+end_src
+** Dashboard
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :if (< (length command-line-args) 2)
+    :config
+    (dashboard-setup-startup-hook)
+    (setq initial-buffer-choice (lambda ()
+                                  (get-buffer "*dashboard*")))
+    (setq dashboard-banner-logo-title "Welcome to Emacs Dashboard")
+    (setq dashboard-startup-banner 'logo)
+    (setq dashboard-center-content t)
+    (setq dashboard-items '((recents  . 5)
+                            (projects . 10)))
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-set-init-info t))
+#+end_src
+** Which Key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure t
+    :defer 1
+    :config (which-key-mode))
+#+end_src
+** Ivy
+*** Base
+#+begin_src emacs-lisp
+  (use-package ivy
+    :ensure t
+    :bind (("C-s" . swiper)
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file))
+    :config
+    (setq ivy-use-virtual-buffers t)
+    (setq enable-recursive-minibuffers t)
+    (ivy-mode 1))
+#+end_src
+*** Counsel
+#+begin_src emacs-lisp
+  (use-package counsel
+    :ensure t
+    :bind
+    (("M-y" . counsel-yank-pop)
+     ("C-h f" . counsel-describe-function)
+     ("C-h v" . counsel-describe-variable)
+     :map ivy-minibuffer-map
+     ("M-y" . ivy-next-line)))
+#+end_src
+*** Icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons-ivy-rich
+    :ensure t
+    :init (all-the-icons-ivy-rich-mode 1))
+
+  (use-package ivy-rich
+    :ensure t
+    :init (ivy-rich-mode 1))
+
+  (setq all-the-icons-ivy-rich-icon-size 0.8)
+#+end_src
+** Edit Indirect
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :ensure t
+    :defer t
+    :config
+    (global-undo-tree-mode 1))
+#+end_src
+
+* Text Stuff
+** Expand Select
+#+begin_src emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :defer t
+    :bind (("C-=" . er/expand-region)))
+#+end_src
+** Multiple Cursor
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :ensure t
+    :defer t
+    :bind (("C->" . mc/mark-next-like-this)
+           ("C-<" . mc/mark-previous-like-this)))
+#+end_src
+** IEdit
+#+begin_src emacs-lisp
+  (use-package iedit
+    :ensure t
+    :defer t)
+#+end_src
+** Company Completion
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :defer 1
+    :config
+    (global-company-mode 1))
+
+  (setq company-minimum-prefix-length 1
+          company-idle-delay 0.0)
+
+  (setq company-global-modes '(not org-mode markdown-mode))
+#+end_src
+** Hungry Delete
+*** Base
+#+begin_src emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :defer 1
+    :config (global-hungry-delete-mode t))
+#+end_src
+*** Disable in Minibuffer
+#+begin_src emacs-lisp
+  (add-hook 'minibuffer-setup-hook (lambda () (hungry-delete-mode -1)))
+#+end_src
+** Move Text
+#+begin_src emacs-lisp
+  (use-package move-text
+    :ensure t
+    :defer t
+    :bind (("M-<up>" . move-text-up)
+           ("M-<down>" . move-text-down)))
+#+end_src
+
+* Programming
+** Snippets
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :defer t)
+#+end_src
+** Projectile
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-mode +1)
+    (setq projectile-completion-system 'ivy))
+#+end_src
+** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :defer t
+    :config
+    (setq git-commit-summary-max-length 50))
+#+end_src
+** Lisp
+*** Emacs Lisp
+#+begin_src emacs-lisp
+  (use-package eldoc
+    :ensure t
+    :defer t
+    :hook (emacs-lisp-mode . eldoc-mode))
+
+  (use-package highlight-defined
+    :ensure t
+    :defer t
+    :hook (emacs-lisp-mode . highlight-defined-mode))
+#+end_src
+** Smart Parens
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :defer t
+    :hook (((clojure-mode cider-repl-mode emacs-lisp-mode slime-repl-mode lisp-mode) . smartparens-strict-mode)
+             ((prog-mode) . smartparens-mode))
+    :config
+    (sp-use-smartparens-bindings)
+    (require 'smartparens-config))
+#+end_src
+** Vterm
+*** Base
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t
+    :defer t)
+#+end_src
+*** Disable Line Numbers
+#+begin_src emacs-lisp
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (display-line-numbers-mode -1)
+              (hide-mode-line-mode t)))
+#+end_src
+** YAML
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :ensure t
+    :defer t)
+#+end_src
+** Json
+#+begin_src emacs-lisp
+  (use-package json-mode
+    :ensure t
+    :defer t)
+#+end_src
+** LSP
+*** Base
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :defer t
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :hook ((prog-mode . lsp-deferred)
+           (lsp-mode . lsp-enable-which-key-integration))
+    :commands (lsp lsp-deferred))
+#+end_src
+*** UI Stuff
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :ensure t
+    :defer t
+    :commands lsp-ui-mode)
+#+end_src
+*** Ivy Integration
+#+begin_src emacs-lisp
+  (use-package lsp-ivy
+    :ensure t
+    :defer t
+    :commands lsp-ivy-workspace-symbol)
+#+end_src
+
+* Org Mode
+** Easy Templates
+- For <s shortcut and stuff.
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+#+end_src
+** Pretty Bullets
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :defer t
+    :hook (org-mode . org-bullets-mode))
+#+end_src
+** Custom Variables
+#+begin_src emacs-lisp
+  (setq org-startup-indented t)
+  (setq org-startup-folded t)
+  (add-hook 'org-mode-hook 'org-toggle-pretty-entities)
+  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+#+end_src
+** Pretty Stuff
+#+begin_src emacs-lisp
+  (setq org-src-fontify-natively t)
+  (setq org-ellipsis "⤵")
+  (setq org-src-tab-acts-natively t)
+#+end_src
+** TOC
+#+begin_src emacs-lisp
+  (use-package toc-org
+    :ensure t
+    :defer t
+    :hook (org-mode . toc-org-mode))
+#+end_src
+** Org Roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :config
+    (setq org-roam-directory (file-truename "~/Documents/Notes/Org"))
+    (org-roam-db-autosync-mode))
+#+end_src
+** Follow Link
+#+begin_src emacs-lisp
+  (setq org-return-follows-link t)
+#+end_src
+* Evil Mode
+** Base Package
+#+begin_src emacs-lisp
+  (use-package evil
+    :ensure t
+    :init
+    (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode 1))
+#+end_src
+** Evil Collection
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (evil-collection-init))
+#+end_src
+** Custom Keybindings
+*** Leader
+#+begin_src emacs-lisp
+  (evil-set-leader 'normal (kbd "SPC"))
+#+end_src
+*** Org Mode
+**** Base
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'global (kbd "<leader>ol") 'org-insert-link)
+#+end_src
+**** Org Roam
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'global (kbd "<leader>orf") 'org-roam-node-find)
+  (evil-define-key 'normal 'global (kbd "<leader>orf") 'org-roam-node-insert)
+  (evil-define-key 'normal 'global (kbd "<leader>orn") 'org-roam-node-create)
+#+end_src
+*** Magit
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'global (kbd "<leader>gg") 'magit-status)
+#+end_src
+*** Help
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'global (kbd "<leader>hv") 'counsel-describe-variable)
+  (evil-define-key 'normal 'global (kbd "<leader>hf") 'counsel-describe-function)
+  (evil-define-key 'normal 'global (kbd "<leader>hk") 'counsel-descbinds)
+  (evil-define-key 'normal 'global (kbd "<leader>hs") 'counsel-describe-symbol)
+#+end_src
+*** Buffers
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'global (kbd "<leader>bb") 'counsel-switch-buffer)
+  (evil-define-key 'normal 'global (kbd "<leader>bk") 'kill-buffer)
+  (evil-define-key 'normal 'global (kbd "<leader>bw") 'kill-buffer-and-window)
+  (evil-define-key 'normal 'global (kbd "<leader>bc") 'kill-current-buffer)
+#+end_src
+*** File
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'global (kbd "<leader>ff") 'counsel-find-file)
+#+end_src
+*** Dead Keys
+- Ignore Dead Keys. Useful for the programmable keys.
+  #+begin_src emacs-lisp
+    (evil-define-key 'normal 'global (kbd "<dead-circumflex>") 'ignore)
+  #+end_src
+* Pdf Mode
+** Base
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :ensure t
+    :defer t
+    :config
+    (require 'pdf-tools)
+    (require 'pdf-view)
+    (require 'pdf-misc)
+    (require 'pdf-occur)
+    (require 'pdf-util)
+    (require 'pdf-annot)
+    (require 'pdf-info)
+    (require 'pdf-isearch)
+    (require 'pdf-history)
+    (require 'pdf-links)
+    (pdf-tools-install :no-query))
+#+end_src
+** Disable Line Numebrs
+#+begin_src emacs-lisp
+  (add-hook 'pdf-view-mode-hook (lambda () (display-line-numbers-mode -1)))
+#+end_src
