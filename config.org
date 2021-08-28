@@ -10,6 +10,10 @@
 #+begin_src emacs-lisp
   (tool-bar-mode -1)
 #+end_src
+** Disable Menubar
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+#+end_src
 ** Shorten Prompt
 #+begin_src emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
@@ -123,6 +127,140 @@
     :config
     (global-undo-tree-mode 1))
 #+end_src
+** Rainbow Mode
+- Highlights delimiters such as parentheses, brackets or braces according to their depth.
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :defer t
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src  
+** Prettify Symbols
+- Displaying characters as fancy symbols (e.g. lambda -> λ)
+#+begin_src emacs-lisp
+  (global-prettify-symbols-mode t)
+#+end_src  
+** Treemacs
+*** Base
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :init
+    (with-eval-after-load 'winum
+      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+    :config
+    (progn
+      (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+            treemacs-deferred-git-apply-delay        0.5
+            treemacs-directory-name-transformer      #'identity
+            treemacs-display-in-side-window          t
+            treemacs-eldoc-display                   t
+            treemacs-file-event-delay                5000
+            treemacs-file-extension-regex            treemacs-last-period-regex-value
+            treemacs-file-follow-delay               0.2
+            treemacs-file-name-transformer           #'identity
+            treemacs-follow-after-init               t
+            treemacs-expand-after-init               t
+            treemacs-git-command-pipe                ""
+            treemacs-goto-tag-strategy               'refetch-index
+            treemacs-indentation                     2
+            treemacs-indentation-string              " "
+            treemacs-is-never-other-window           nil
+            treemacs-max-git-entries                 5000
+            treemacs-missing-project-action          'ask
+            treemacs-move-forward-on-expand          nil
+            treemacs-no-png-images                   nil
+            treemacs-no-delete-other-windows         t
+            treemacs-project-follow-cleanup          nil
+            treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+            treemacs-position                        'left
+            treemacs-read-string-input               'from-child-frame
+            treemacs-recenter-distance               0.1
+            treemacs-recenter-after-file-follow      nil
+            treemacs-recenter-after-tag-follow       nil
+            treemacs-recenter-after-project-jump     'always
+            treemacs-recenter-after-project-expand   'on-distance
+            treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+            treemacs-show-cursor                     nil
+            treemacs-show-hidden-files               t
+            treemacs-silent-filewatch                nil
+            treemacs-silent-refresh                  nil
+            treemacs-sorting                         'alphabetic-asc
+            treemacs-select-when-already-in-treemacs 'move-back
+            treemacs-space-between-root-nodes        t
+            treemacs-tag-follow-cleanup              t
+            treemacs-tag-follow-delay                1.5
+            treemacs-user-mode-line-format           nil
+            treemacs-user-header-line-format         nil
+            treemacs-width                           35
+            treemacs-width-is-initially-locked       t
+            treemacs-workspace-switch-cleanup        nil)
+
+      ;; The default width and height of the icons is 22 pixels. If you are
+      ;; using a Hi-DPI display, uncomment this to double the icon size.
+      ;;(treemacs-resize-icons 44)
+
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode 'always)
+
+      (pcase (cons (not (null (executable-find "git")))
+                   (not (null treemacs-python-executable)))
+        (`(t . t)
+         (treemacs-git-mode 'deferred))
+        (`(t . _)
+         (treemacs-git-mode 'simple)))
+
+      (treemacs-hide-gitignored-files-mode nil))
+    :bind
+    (:map global-map
+          ("M-0"       . treemacs-select-window)
+          ("C-x t 1"   . treemacs-delete-other-windows)
+          ("C-x t t"   . treemacs)
+          ("C-x t B"   . treemacs-bookmark)
+          ("C-x t C-t" . treemacs-find-file)
+          ("C-x t M-t" . treemacs-find-tag)))
+#+end_src
+*** Evil Integration
+#+begin_src emacs-lisp
+  (use-package treemacs-evil
+    :after (treemacs evil)
+    :ensure t)
+#+end_src
+*** Projectile Integration
+#+begin_src emacs-lisp
+  (use-package treemacs-projectile
+    :after (treemacs projectile)
+    :ensure t)
+#+end_src
+*** Icons
+#+begin_src emacs-lisp
+  (use-package treemacs-icons-dired
+    :after (treemacs dired)
+    :ensure t
+    :config (treemacs-icons-dired-mode))
+#+end_src
+*** Magit Integration
+#+begin_src emacs-lisp
+  (use-package treemacs-magit
+    :after (treemacs magit)
+    :ensure t)
+#+end_src
+** Tabs
+#+begin_src emacs-lisp
+  (use-package centaur-tabs
+    :ensure t
+    :custom
+    (centaur-tabs-style "box")
+    (centaur-tabs-set-icons t)
+    (centaur-tabs-gray-out-icons 'buffer)
+    (centaur-tabs-set-bar 'left)
+    (centaur-tabs-height 28)
+    :config
+    (centaur-tabs-mode t)
+    (centaur-tabs-group-by-projectile-project))
+#+end_src
 
 * Text Stuff
 ** Expand Select
@@ -147,17 +285,18 @@
     :defer t)
 #+end_src
 ** Company Completion
+- LSP no longer uses company.
 #+begin_src emacs-lisp
-  (use-package company
-    :ensure t
-    :defer 1
-    :config
-    (global-company-mode 1))
-
-  (setq company-minimum-prefix-length 1
-          company-idle-delay 0.0)
-
-  (setq company-global-modes '(not org-mode markdown-mode))
+  ;; (use-package company
+  ;;   :ensure t
+  ;;   :defer 1
+  ;;   :config
+  ;;   (global-company-mode 1))
+  ;; 
+  ;; (setq company-minimum-prefix-length 1
+  ;;         company-idle-delay 0.0)
+  ;; 
+  ;; (setq company-global-modes '(not org-mode markdown-mode))
 #+end_src
 ** Hungry Delete
 *** Base
@@ -205,6 +344,7 @@
 #+end_src
 ** Lisp
 *** Emacs Lisp
+**** Basic
 #+begin_src emacs-lisp
   (use-package eldoc
     :ensure t
@@ -261,7 +401,7 @@
     :defer t
     :init
     (setq lsp-keymap-prefix "C-c l")
-    :hook ((prog-mode . lsp-deferred)
+    :hook (((rustic-mode shell-mode json-mode cmake-mode yaml-mode c++-mode c-mode) . lsp-deferred)
            (lsp-mode . lsp-enable-which-key-integration))
     :commands (lsp lsp-deferred))
 #+end_src
@@ -279,6 +419,21 @@
     :defer t
     :commands lsp-ivy-workspace-symbol)
 #+end_src
+** DAP Mode
+*** Base
+#+begin_src emacs-lisp
+  (use-package dap-mode
+    :ensure t
+    :defer t)
+#+end_src
+** Rust
+*** Rustic
+#+begin_src emacs-lisp
+  (use-package rustic
+    :ensure t
+    :defer t)
+#+end_src
+** C/C++
 
 * Org Mode
 ** Easy Templates
@@ -314,6 +469,7 @@
     :hook (org-mode . toc-org-mode))
 #+end_src
 ** Org Roam
+*** Base
 #+begin_src emacs-lisp
   (use-package org-roam
     :ensure t
@@ -325,6 +481,14 @@
 #+begin_src emacs-lisp
   (setq org-return-follows-link t)
 #+end_src
+** Math Preview
+- To preview math fragmaents in Tex.
+#+begin_src emacs-lisp
+  (use-package math-preview
+    :ensure t
+    :defer t)
+#+end_src  
+
 * Evil Mode
 ** Base Package
 #+begin_src emacs-lisp
@@ -357,8 +521,12 @@
 **** Org Roam
 #+begin_src emacs-lisp
   (evil-define-key 'normal 'global (kbd "<leader>orf") 'org-roam-node-find)
-  (evil-define-key 'normal 'global (kbd "<leader>orf") 'org-roam-node-insert)
-  (evil-define-key 'normal 'global (kbd "<leader>orn") 'org-roam-node-create)
+  (evil-define-key 'normal 'global (kbd "<leader>ori") 'org-roam-node-insert)
+  (evil-define-key 'normal 'global (kbd "<leader>ort") 'org-roam-tag-add)
+  (evil-define-key 'normal 'global (kbd "<leader>orc") 'org-roam-capture)
+  (evil-define-key 'normal 'global (kbd "<leader>ora") 'org-roam-alias-add)
+  (evil-define-key 'normal 'global (kbd "<leader>org") 'org-roam-graph)
+  (evil-define-key 'normal 'global (kbd "<leader>orb") 'org-roam-buffer-toggle)
 #+end_src
 *** Magit
 #+begin_src emacs-lisp
@@ -387,6 +555,10 @@
   #+begin_src emacs-lisp
     (evil-define-key 'normal 'global (kbd "<dead-circumflex>") 'ignore)
   #+end_src
+*** Treemacs
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'global (kbd "<leader>tt") 'treemacs)
+#+end_src
 * Pdf Mode
 ** Base
 #+begin_src emacs-lisp

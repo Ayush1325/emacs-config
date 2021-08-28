@@ -15,7 +15,11 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(setq custom-file "~/.emacs.d/.emacs-custom.el")
+(setq custom-file "~/.config/emacs/.emacs-custom.el")
 (load custom-file)
 
-(org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
+(let ((cmake-path "~/.config/emacs/custom_modes/cmake-mode.el"))
+  (load cmake-path)
+  (require 'cmake-mode))
+
+(org-babel-load-file (expand-file-name "~/.config/emacs/config.org"))
