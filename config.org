@@ -284,20 +284,6 @@
     :ensure t
     :defer t)
 #+end_src
-** Company Completion
-- LSP no longer uses company.
-#+begin_src emacs-lisp
-  ;; (use-package company
-  ;;   :ensure t
-  ;;   :defer 1
-  ;;   :config
-  ;;   (global-company-mode 1))
-  ;; 
-  ;; (setq company-minimum-prefix-length 1
-  ;;         company-idle-delay 0.0)
-  ;; 
-  ;; (setq company-global-modes '(not org-mode markdown-mode))
-#+end_src
 ** Hungry Delete
 *** Base
 #+begin_src emacs-lisp
@@ -317,6 +303,30 @@
     :defer t
     :bind (("M-<up>" . move-text-up)
            ("M-<down>" . move-text-down)))
+#+end_src
+** Company
+*** Base
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :custom
+    (company-backends '(company-capf company-files company-yasnippet company-etags company-elisp))
+    (company-require-match nil)
+    (company-tooltip-align-annotations t)
+    (company-eclim-auto-save nil)
+    (company-dabbrev-downcase nil)
+    (company-echo-delay 0)
+    (company-idle-delay 0)
+    (company-tooltip-limit 20)
+    :config
+    (global-company-mode))
+#+end_src
+*** Fuzzy Matching
+#+begin_src emacs-lisp
+  (use-package company-fuzzy
+    :ensure t
+    :config
+    (global-company-fuzzy-mode 1))
 #+end_src
 
 * Programming
@@ -355,6 +365,13 @@
     :ensure t
     :defer t
     :hook (emacs-lisp-mode . highlight-defined-mode))
+#+end_src
+**** Company Backeds
+#+begin_src emacs-lisp
+  ;;(add-hook 'emacs-lisp-mode
+  ;;          (lambda ()
+  ;;            (setq-local company-backends (append company-backends '(company-etags company-elisp)))
+  ;;            (company-fuzzy-mode 1)))
 #+end_src
 ** Smart Parens
 #+begin_src emacs-lisp
@@ -402,7 +419,8 @@
     :init
     (setq lsp-keymap-prefix "C-c l")
     :hook (((rustic-mode shell-mode json-mode cmake-mode yaml-mode c++-mode c-mode) . lsp-deferred)
-           (lsp-mode . lsp-enable-which-key-integration))
+           (lsp-mode . lsp-enable-which-key-integration)
+           (lsp-mode . yas-minor-mode))
     :commands (lsp lsp-deferred))
 #+end_src
 *** UI Stuff
@@ -519,14 +537,21 @@
   (evil-define-key 'normal 'global (kbd "<leader>ol") 'org-insert-link)
 #+end_src
 **** Org Roam
+***** Global
 #+begin_src emacs-lisp
-  (evil-define-key 'normal 'global (kbd "<leader>orf") 'org-roam-node-find)
-  (evil-define-key 'normal 'global (kbd "<leader>ori") 'org-roam-node-insert)
-  (evil-define-key 'normal 'global (kbd "<leader>ort") 'org-roam-tag-add)
-  (evil-define-key 'normal 'global (kbd "<leader>orc") 'org-roam-capture)
-  (evil-define-key 'normal 'global (kbd "<leader>ora") 'org-roam-alias-add)
-  (evil-define-key 'normal 'global (kbd "<leader>org") 'org-roam-graph)
-  (evil-define-key 'normal 'global (kbd "<leader>orb") 'org-roam-buffer-toggle)
+  (evil-define-key 'normal 'global
+    (kbd "<leader>oi") 'org-toggle-inline-images
+    (kbd "<leader>orc") 'org-roam-capture
+    (kbd "<leader>org") 'org-roam-graph
+    (kbd "<leader>orf") 'org-roam-node-find)
+#+end_src
+***** Local
+#+begin_src emacs-lisp
+  (evil-define-key 'normal 'org-mode
+    (kbd "<leader>ort") 'org-roam-tag-add
+    (kbd "<leader>ora") 'org-roam-alias-add
+    (kbd "<leader>orb") 'org-roam-buffer-toggle
+    (kbd "<leader>ori") 'org-roam-node-insert)
 #+end_src
 *** Magit
 #+begin_src emacs-lisp
@@ -534,21 +559,25 @@
 #+end_src
 *** Help
 #+begin_src emacs-lisp
-  (evil-define-key 'normal 'global (kbd "<leader>hv") 'counsel-describe-variable)
-  (evil-define-key 'normal 'global (kbd "<leader>hf") 'counsel-describe-function)
-  (evil-define-key 'normal 'global (kbd "<leader>hk") 'counsel-descbinds)
-  (evil-define-key 'normal 'global (kbd "<leader>hs") 'counsel-describe-symbol)
+  (evil-define-key 'normal 'global
+    (kbd "<leader>hf") 'counsel-describe-function
+    (kbd "<leader>hk") 'counsel-descbinds
+    (kbd "<leader>hs") 'counsel-describe-symbol
+    (kbd "<leader>hv") 'counsel-describe-variable)
 #+end_src
 *** Buffers
 #+begin_src emacs-lisp
-  (evil-define-key 'normal 'global (kbd "<leader>bb") 'counsel-switch-buffer)
-  (evil-define-key 'normal 'global (kbd "<leader>bk") 'kill-buffer)
-  (evil-define-key 'normal 'global (kbd "<leader>bw") 'kill-buffer-and-window)
-  (evil-define-key 'normal 'global (kbd "<leader>bc") 'kill-current-buffer)
+  (evil-define-key 'normal 'global
+    (kbd "<leader>bk") 'kill-buffer
+    (kbd "<leader>bw") 'kill-buffer-and-window
+    (kbd "<leader>bc") 'kill-current-buffer
+    (kbd "<leader>bb") 'counsel-switch-buffer)
 #+end_src
 *** File
 #+begin_src emacs-lisp
-  (evil-define-key 'normal 'global (kbd "<leader>ff") 'counsel-find-file)
+  (evil-define-key 'normal 'global
+    (kbd "<leader>.") 'counsel-find-file
+    (kbd "<leader>ff") 'counsel-find-file)
 #+end_src
 *** Dead Keys
 - Ignore Dead Keys. Useful for the programmable keys.
