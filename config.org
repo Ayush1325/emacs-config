@@ -451,7 +451,13 @@
     :ensure t
     :defer t)
 #+end_src
-** C/C++
+** Journalctl
+#+begin_src emacs-lisp
+  (use-package journalctl-mode
+    :ensure t
+    :defer t)
+
+#+end_src
 
 * Org Mode
 ** Easy Templates
@@ -547,7 +553,7 @@
 #+end_src
 ***** Local
 #+begin_src emacs-lisp
-  (evil-define-key 'normal 'org-mode
+  (evil-define-key 'normal 'org-mode-map
     (kbd "<leader>ort") 'org-roam-tag-add
     (kbd "<leader>ora") 'org-roam-alias-add
     (kbd "<leader>orb") 'org-roam-buffer-toggle
